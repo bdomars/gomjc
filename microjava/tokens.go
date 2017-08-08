@@ -1,6 +1,6 @@
 package microjava
 
-// TokenCode is a type for all token classes used in the scanner
+// TokenCode is a type for all token kinds used in the scanner
 type TokenCode int
 
 const (
@@ -50,6 +50,47 @@ type Token struct {
 	column int
 	value  int
 	data   string
+}
+
+// TokenNames will map a token code to a human readable name
+var TokenNames = map[TokenCode]string{
+	tcNone:      "None",
+	tcIdent:     "Identifier",
+	tcNumber:    "Number",
+	tcCharCon:   "Character Constant",
+	tcPlus:      "+",
+	tcMinus:     "-",
+	tcTimes:     "*",
+	tcSlash:     "/",
+	tcRem:       "Rem?",
+	tcEql:       "==",
+	tcNeq:       "!=",
+	tcLss:       "<",
+	tcLeq:       "<=",
+	tcGtr:       ">",
+	tcGeq:       ">=",
+	tcAssign:    "=",
+	tcSemicolon: ";",
+	tcComma:     ",",
+	tcPeriod:    ".",
+	tcLpar:      "(",
+	tcRpar:      ")",
+	tcLbrack:    "[",
+	tcRbrack:    "]",
+	tcLbrace:    "{",
+	tcRbrace:    "}",
+	tcClass:     "class",
+	tcElse:      "else",
+	tcFinal:     "final",
+	tcIf:        "if",
+	tcNew:       "new",
+	tcPrint:     "print",
+	tcProgram:   "program",
+	tcRead:      "read",
+	tcReturn:    "return",
+	tcVoid:      "void",
+	tcWhile:     "while",
+	tcEOF:       "EOF",
 }
 
 // KeywordMap defines a lookup table for the keywords used
