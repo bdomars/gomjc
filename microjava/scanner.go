@@ -41,10 +41,10 @@ func (s *Scanner) NextToken() *Token {
 	} else if s.currChar == '\'' {
 		//s.readCharacter(token)
 	} else if s.currChar == '/' {
-		s.NextChar()
+		s.nextChar()
 		if s.currChar == '/' {
 			for {
-				s.NextChar() // skipping comments
+				s.nextChar() // skipping comments
 				if s.currChar == '\n' || s.currChar == '\u0080' {
 					break
 				}
@@ -58,7 +58,7 @@ func (s *Scanner) NextToken() *Token {
 }
 
 // NextChar advances the scanner to the next character in the stream
-func (s *Scanner) NextChar() {
+func (s *Scanner) nextChar() {
 
 	c, err := s.reader.ReadByte()
 	if err != nil {
@@ -77,7 +77,7 @@ func (s *Scanner) NextChar() {
 
 func (s *Scanner) skipNonPrint() {
 	for s.currChar <= ' ' {
-		s.NextChar()
+		s.nextChar()
 	}
 }
 
@@ -86,7 +86,7 @@ func (s *Scanner) readNumber(token *Token) {
 
 	for ascii.IsDigit(s.currChar) {
 		lexeme.WriteByte(s.currChar)
-		s.NextChar()
+		s.nextChar()
 	}
 
 	token.kind = tcNumber
@@ -105,9 +105,35 @@ func (s *Scanner) readName(token *Token) {
 
 	for ascii.IsLetter(s.currChar) {
 		lexeme.WriteByte(s.currChar)
-		s.NextChar()
+		s.nextChar()
 	}
 
 	token.data = lexeme.String()
 	token.kind = GetKeywordKind(token.data)
+}
+
+func (s *Scanner) readCharacter(token *Token) {
+	var lexeme bytes.Buffer
+	lexeme.WriteByte(s.currChar)
+	s.nextChar()
+	lexeme.WriteByte(s.currChar)
+	if s.currChar == '\'' {
+		s.errorEmptyChar(token)
+	} else if s.currChar == '\\' {
+		s.readEscapedChar(token)
+	} else {
+		s.readCloseChar(token)
+	}
+}
+
+func (s *Scanner) errorEmptyChar(token *Token) {
+	// TODO
+}
+
+func (s *Scanner) readEscapedChar(token *Token) {
+	// TODO
+}
+
+func (s *Scanner) readCloseChar(token *Token) {
+	// TODO
 }

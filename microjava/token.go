@@ -49,15 +49,12 @@ const (
 
 // Token holds the representation of one token
 type Token struct {
-	kind   TokenCode
-	line   int
-	column int
-	value  int
-	data   string
-}
-
-func (t Token) String() string {
-	return fmt.Sprintf("<Token: '%v'>", TokenNames[t.kind])
+	kind     TokenCode
+	line     int
+	column   int
+	value    int
+	data     string
+	errorMgs string
 }
 
 // TokenNames will map a token code to a human readable name
@@ -99,6 +96,14 @@ var TokenNames = map[TokenCode]string{
 	tcVoid:      "void",
 	tcWhile:     "while",
 	tcEOF:       "EOF",
+}
+
+func (t Token) String() string {
+	if t.kind == tcIdent || t.kind == tcNumber {
+		return fmt.Sprintf("<Token: kind='%v', data='%v'>", TokenNames[t.kind], t.data)
+	}
+	return fmt.Sprintf("<Token: kind='%v'>", TokenNames[t.kind])
+
 }
 
 // KeywordMap defines a lookup table for the keywords used
