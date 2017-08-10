@@ -24,5 +24,8 @@ func main() {
 
 	reader := bufio.NewReader(infile)
 	scanner := microjava.NewScanner(reader)
-	fmt.Printf("Poop: %v", scanner.NextToken())
+	for i := 0; i < 10; i++ {
+		token := scanner.NextToken()
+		fmt.Println(token)
+	}
 }

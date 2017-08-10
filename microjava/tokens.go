@@ -1,5 +1,9 @@
 package microjava
 
+import (
+	"fmt"
+)
+
 // TokenCode is a type for all token kinds used in the scanner
 type TokenCode int
 
@@ -52,17 +56,21 @@ type Token struct {
 	data   string
 }
 
+func (t Token) String() string {
+	return fmt.Sprintf("<Token: '%v'>", TokenNames[t.kind])
+}
+
 // TokenNames will map a token code to a human readable name
 var TokenNames = map[TokenCode]string{
 	tcNone:      "None",
 	tcIdent:     "Identifier",
 	tcNumber:    "Number",
-	tcCharCon:   "Character Constant",
+	tcCharCon:   "CharacterConstant",
 	tcPlus:      "+",
 	tcMinus:     "-",
 	tcTimes:     "*",
 	tcSlash:     "/",
-	tcRem:       "Rem?",
+	tcRem:       "%",
 	tcEql:       "==",
 	tcNeq:       "!=",
 	tcLss:       "<",
@@ -106,4 +114,12 @@ var KeywordMap = map[string]TokenCode{
 	"return":  tcReturn,
 	"void":    tcVoid,
 	"while":   tcWhile,
+}
+
+// GetKeywordKind returns a TokenCode for a keyword string, or defaults to the Identifier kind
+func GetKeywordKind(lexeme string) TokenCode {
+	if kind, ok := KeywordMap[lexeme]; ok {
+		return kind
+	}
+	return tcIdent
 }
