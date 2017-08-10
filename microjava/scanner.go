@@ -120,20 +120,39 @@ func (s *Scanner) readCharacter(token *Token) {
 	if s.currChar == '\'' {
 		s.errorEmptyChar(token)
 	} else if s.currChar == '\\' {
-		s.readEscapedChar(token)
+		s.readEscapedChar(token, &lexeme)
 	} else {
-		s.readCloseChar(token)
+		s.readCloseChar(token, &lexeme)
 	}
 }
 
 func (s *Scanner) errorEmptyChar(token *Token) {
+	token.errorMsg = "empty character token"
+	token.kind = tcNone
+	token.data = "''"
+	token.column = s.column
+	s.nextChar()
+}
+
+func (s *Scanner) readEscapedChar(token *Token, lexeme *bytes.Buffer) {
+	s.nextChar()
+	lexeme.WriteByte(s.currChar)
+	if s.currChar == 'n' || s.currChar == 't' || s.currChar == 'r' {
+		s.readCloseChar(token, lexeme)
+	} else {
+		token.errorMsg = "invalid character escape sequence"
+		token.kind = tcNone
+		token.column = s.column
+		s.skipUntilCloseChar(lexeme)
+		token.data = lexeme.String()
+		s.nextChar()
+	}
+}
+
+func (s *Scanner) readCloseChar(token *Token, lexeme *bytes.Buffer) {
 	// TODO
 }
 
-func (s *Scanner) readEscapedChar(token *Token) {
-	// TODO
-}
-
-func (s *Scanner) readCloseChar(token *Token) {
+func (s *Scanner) skipUntilCloseChar(lexeme *bytes.Buffer) {
 	// TODO
 }

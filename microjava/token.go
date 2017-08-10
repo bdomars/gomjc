@@ -54,7 +54,7 @@ type Token struct {
 	column   int
 	value    int
 	data     string
-	errorMgs string
+	errorMsg string
 }
 
 // TokenNames will map a token code to a human readable name
