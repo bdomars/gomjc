@@ -1,0 +1,11 @@
+{
+	"ImportPath": "github.com/bdomars/gomjc",
+	"GoVersion": "go1.8",
+	"GodepVersion": "v79",
+	"Deps": [
+		{
+			"ImportPath": "github.com/galsondor/go-ascii",
+			"Rev": "e2eb5175fb10b11f4356c70dbee07f1d7bdeaf53"
+		}
+	]
+}
