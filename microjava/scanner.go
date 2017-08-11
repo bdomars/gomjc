@@ -153,9 +153,39 @@ func (s *Scanner) readCloseChar(token *Token, lexeme *bytes.Buffer) {
 	s.nextChar()
 	lexeme.WriteByte(s.currChar)
 
-	// poop
+	if s.currChar == '\'' {
+		token.data = lexeme.String()
+		token.kind = tcCharCon
+		if token.data[1] == '\\' {
+			charVal := token.data[1]
+			if charVal == 'n' {
+				token.charValue = '\n'
+			} else if charVal == 'r' {
+				token.charValue = '\r'
+			} else if charVal == 't' {
+				token.charValue = '\t'
+			}
+		} else {
+			token.charValue = token.data[1]
+		}
+		s.nextChar()
+	} else {
+		token.errorMsg = "unclosed char constant"
+		token.kind = tcNone
+		token.column = s.column
+		s.skipUntilCloseChar(lexeme)
+		token.data = lexeme.String()
+		s.nextChar()
+	}
 }
 
 func (s *Scanner) skipUntilCloseChar(lexeme *bytes.Buffer) {
-	// TODO
+	for {
+		s.nextChar()
+		lexeme.WriteByte(s.currChar)
+
+		if s.currChar == '\'' || s.currChar == '\u0080' {
+			break
+		}
+	}
 }
