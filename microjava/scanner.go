@@ -2,6 +2,7 @@ package microjava
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"strconv"
 
@@ -188,4 +189,31 @@ func (s *Scanner) skipUntilCloseChar(lexeme *bytes.Buffer) {
 			break
 		}
 	}
+}
+
+func (s *Scanner) readOperator(token *Token) bool {
+	if s.currChar == '=' {
+		s.nextChar()
+		if s.currChar == '=' {
+			token.kind = tcEql
+			s.nextChar()
+		} else {
+			token.kind = tcAssign
+		}
+	} else if s.currChar == '!' {
+		s.nextChar()
+		if s.currChar == '=' {
+			token.kind = tcNeq
+		} else {
+			token.kind = tcNone
+			token.errorMsg = "invalid operator"
+			token.data = fmt.Sprintf("!%v", s.currChar)
+			s.nextChar()
+			return false
+		}
+	} else {
+		return false
+	}
+	token.data = "poop"
+	return true
 }
