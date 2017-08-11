@@ -49,12 +49,13 @@ const (
 
 // Token holds the representation of one token
 type Token struct {
-	kind     TokenCode
-	line     int
-	column   int
-	value    int
-	data     string
-	errorMsg string
+	kind      TokenCode
+	line      int
+	column    int
+	value     int
+	data      string
+	errorMsg  string
+	charValue byte
 }
 
 // TokenNames will map a token code to a human readable name

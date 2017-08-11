@@ -150,7 +150,10 @@ func (s *Scanner) readEscapedChar(token *Token, lexeme *bytes.Buffer) {
 }
 
 func (s *Scanner) readCloseChar(token *Token, lexeme *bytes.Buffer) {
-	// TODO
+	s.nextChar()
+	lexeme.WriteByte(s.currChar)
+
+	// poop
 }
 
 func (s *Scanner) skipUntilCloseChar(lexeme *bytes.Buffer) {
