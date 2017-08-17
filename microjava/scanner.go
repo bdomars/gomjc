@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"strings"
 
 	ascii "github.com/galsondor/go-ascii"
 )
@@ -211,6 +212,25 @@ func (s *Scanner) readOperator(token *Token) bool {
 			s.nextChar()
 			return false
 		}
+	} else if s.currChar == '<' {
+		s.nextChar()
+		if s.currChar == '=' {
+			token.kind = tcLeq
+			s.nextChar()
+		} else {
+			token.kind = tcLss
+		}
+	} else if s.currChar == '>' {
+		s.nextChar()
+		if s.currChar == '=' {
+			token.kind = tcGeq
+			s.nextChar()
+		} else {
+			token.kind = tcGtr
+		}
+	} else if strings.IndexByte("+-*%;,.()[]{}", s.currChar) != -1 {
+		token.kind = GetOperatorKind(string(s.currChar))
+		s.nextChar()
 	} else {
 		return false
 	}

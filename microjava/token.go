@@ -129,3 +129,33 @@ func GetKeywordKind(lexeme string) TokenCode {
 	}
 	return tcIdent
 }
+
+var OperatorMap = map[string]TokenCode{
+	"+": tcPlus,
+	"-": tcMinus,
+	"*": tcTimes,
+	"%": tcRem,
+	";": tcSemicolon,
+	".": tcPeriod,
+	"(": tcLpar,
+	")": tcRpar,
+	"[": tcLbrack,
+	"]": tcRbrack,
+	"{": tcLbrace,
+	"}": tcRbrace,
+}
+
+// GetOperatorKind returns a TokenCode for an operator string
+func GetOperatorKind(lexeme string) TokenCode {
+	if kind, ok := KeywordMap[lexeme]; ok {
+		return kind
+	}
+	return tcNone
+}
+
+func GetTokenName(lexeme string) string {
+	if name, ok := TokenNames[lexeme]; ok {
+		return name
+	}
+	return "unknown"
+}
