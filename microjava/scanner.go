@@ -31,17 +31,17 @@ func NewScanner(r io.ByteReader) *Scanner {
 func (s *Scanner) NextToken() *Token {
 	s.skipNonPrint()
 	token := &Token{
-		line:   s.line,
-		column: s.column,
+		Line:   s.line,
+		Column: s.column,
 	}
 	if s.currChar == '\u0080' {
-		token.kind = tcEOF
+		token.Kind = tcEOF
 	} else if ascii.IsDigit(s.currChar) {
 		s.readNumber(token)
 	} else if ascii.IsLetter(s.currChar) {
 		s.readName(token)
 	} else if s.currChar == '\'' {
-		//s.readCharacter(token)
+		s.readCharacter(token)
 	} else if s.currChar == '/' {
 		s.nextChar()
 		if s.currChar == '/' {
@@ -52,8 +52,13 @@ func (s *Scanner) NextToken() *Token {
 				}
 			}
 		} else {
-			token.kind = tcSlash
-			token.data = "/"
+			token.Kind = tcSlash
+			token.Data = "/"
+		}
+	} else if !s.readOperator(token) {
+		if token.Data == "" {
+			token.Kind = tcNone
+			token.ErrorMsg = "invalid symbol"
 		}
 	}
 	return token
@@ -63,7 +68,9 @@ func (s *Scanner) NextToken() *Token {
 func (s *Scanner) nextChar() {
 
 	c, err := s.reader.ReadByte()
-	if err != nil {
+	if err == io.EOF {
+		c = '\u0080'
+	} else if err != nil {
 		panic(err)
 	}
 
@@ -91,14 +98,14 @@ func (s *Scanner) readNumber(token *Token) {
 		s.nextChar()
 	}
 
-	token.kind = tcNumber
-	token.data = lexeme.String()
+	token.Kind = tcNumber
+	token.Data = lexeme.String()
 
-	value, err := strconv.ParseInt(token.data, 10, 32)
+	value, err := strconv.ParseInt(token.Data, 10, 32)
 	if err != nil {
 		panic(err)
 	}
-	token.value = int(value)
+	token.Value = int(value)
 
 }
 
@@ -110,8 +117,8 @@ func (s *Scanner) readName(token *Token) {
 		s.nextChar()
 	}
 
-	token.data = lexeme.String()
-	token.kind = GetKeywordKind(token.data)
+	token.Data = lexeme.String()
+	token.Kind = GetKeywordKind(token.Data)
 }
 
 func (s *Scanner) readCharacter(token *Token) {
@@ -129,10 +136,10 @@ func (s *Scanner) readCharacter(token *Token) {
 }
 
 func (s *Scanner) errorEmptyChar(token *Token) {
-	token.errorMsg = "empty character token"
-	token.kind = tcNone
-	token.data = "''"
-	token.column = s.column
+	token.ErrorMsg = "empty character token"
+	token.Kind = tcNone
+	token.Data = "''"
+	token.Column = s.column
 	s.nextChar()
 }
 
@@ -142,11 +149,11 @@ func (s *Scanner) readEscapedChar(token *Token, lexeme *bytes.Buffer) {
 	if s.currChar == 'n' || s.currChar == 't' || s.currChar == 'r' {
 		s.readCloseChar(token, lexeme)
 	} else {
-		token.errorMsg = "invalid character escape sequence"
-		token.kind = tcNone
-		token.column = s.column
+		token.ErrorMsg = "invalid character escape sequence"
+		token.Kind = tcNone
+		token.Column = s.column
 		s.skipUntilCloseChar(lexeme)
-		token.data = lexeme.String()
+		token.Data = lexeme.String()
 		s.nextChar()
 	}
 }
@@ -156,27 +163,27 @@ func (s *Scanner) readCloseChar(token *Token, lexeme *bytes.Buffer) {
 	lexeme.WriteByte(s.currChar)
 
 	if s.currChar == '\'' {
-		token.data = lexeme.String()
-		token.kind = tcCharCon
-		if token.data[1] == '\\' {
-			charVal := token.data[1]
+		token.Data = lexeme.String()
+		token.Kind = tcCharCon
+		if token.Data[1] == '\\' {
+			charVal := token.Data[1]
 			if charVal == 'n' {
-				token.charValue = '\n'
+				token.CharValue = '\n'
 			} else if charVal == 'r' {
-				token.charValue = '\r'
+				token.CharValue = '\r'
 			} else if charVal == 't' {
-				token.charValue = '\t'
+				token.CharValue = '\t'
 			}
 		} else {
-			token.charValue = token.data[1]
+			token.CharValue = token.Data[1]
 		}
 		s.nextChar()
 	} else {
-		token.errorMsg = "unclosed char constant"
-		token.kind = tcNone
-		token.column = s.column
+		token.ErrorMsg = "unclosed char constant"
+		token.Kind = tcNone
+		token.Column = s.column
 		s.skipUntilCloseChar(lexeme)
-		token.data = lexeme.String()
+		token.Data = lexeme.String()
 		s.nextChar()
 	}
 }
@@ -196,44 +203,44 @@ func (s *Scanner) readOperator(token *Token) bool {
 	if s.currChar == '=' {
 		s.nextChar()
 		if s.currChar == '=' {
-			token.kind = tcEql
+			token.Kind = tcEql
 			s.nextChar()
 		} else {
-			token.kind = tcAssign
+			token.Kind = tcAssign
 		}
 	} else if s.currChar == '!' {
 		s.nextChar()
 		if s.currChar == '=' {
-			token.kind = tcNeq
+			token.Kind = tcNeq
 		} else {
-			token.kind = tcNone
-			token.errorMsg = "invalid operator"
-			token.data = fmt.Sprintf("!%v", s.currChar)
+			token.Kind = tcNone
+			token.ErrorMsg = "invalid operator"
+			token.Data = fmt.Sprintf("!%v", s.currChar)
 			s.nextChar()
 			return false
 		}
 	} else if s.currChar == '<' {
 		s.nextChar()
 		if s.currChar == '=' {
-			token.kind = tcLeq
+			token.Kind = tcLeq
 			s.nextChar()
 		} else {
-			token.kind = tcLss
+			token.Kind = tcLss
 		}
 	} else if s.currChar == '>' {
 		s.nextChar()
 		if s.currChar == '=' {
-			token.kind = tcGeq
+			token.Kind = tcGeq
 			s.nextChar()
 		} else {
-			token.kind = tcGtr
+			token.Kind = tcGtr
 		}
 	} else if strings.IndexByte("+-*%;,.()[]{}", s.currChar) != -1 {
-		token.kind = GetOperatorKind(string(s.currChar))
+		token.Kind = GetOperatorKind(string(s.currChar))
 		s.nextChar()
 	} else {
 		return false
 	}
-	token.data = "poop"
+	token.Data = "poop"
 	return true
 }

@@ -49,13 +49,13 @@ const (
 
 // Token holds the representation of one token
 type Token struct {
-	kind      TokenCode
-	line      int
-	column    int
-	value     int
-	data      string
-	errorMsg  string
-	charValue byte
+	Kind      TokenCode
+	Line      int
+	Column    int
+	Value     int
+	Data      string
+	ErrorMsg  string
+	CharValue byte
 }
 
 // TokenNames will map a token code to a human readable name
@@ -100,10 +100,10 @@ var TokenNames = map[TokenCode]string{
 }
 
 func (t Token) String() string {
-	if t.kind == tcIdent || t.kind == tcNumber {
-		return fmt.Sprintf("<Token: kind='%v', data='%v'>", TokenNames[t.kind], t.data)
+	if t.Kind == tcIdent || t.Kind == tcNumber {
+		return fmt.Sprintf("<Token: kind='%v', data='%v'>", TokenNames[t.Kind], t.Data)
 	}
-	return fmt.Sprintf("<Token: kind='%v'>", TokenNames[t.kind])
+	return fmt.Sprintf("<Token: kind='%v'>", TokenNames[t.Kind])
 
 }
 
@@ -130,6 +130,7 @@ func GetKeywordKind(lexeme string) TokenCode {
 	return tcIdent
 }
 
+// OperatorMap for looking up token code for an operator
 var OperatorMap = map[string]TokenCode{
 	"+": tcPlus,
 	"-": tcMinus,
@@ -147,15 +148,18 @@ var OperatorMap = map[string]TokenCode{
 
 // GetOperatorKind returns a TokenCode for an operator string
 func GetOperatorKind(lexeme string) TokenCode {
-	if kind, ok := KeywordMap[lexeme]; ok {
+	if kind, ok := OperatorMap[lexeme]; ok {
 		return kind
 	}
 	return tcNone
 }
 
-func GetTokenName(lexeme string) string {
-	if name, ok := TokenNames[lexeme]; ok {
-		return name
-	}
-	return "unknown"
+// IsEOF returns true if this is the last token in stream
+func (t *Token) IsEOF() bool {
+	return t.Kind == tcEOF
+}
+
+// IsError returns true if this is an invalid token with an error message
+func (t *Token) IsError() bool {
+	return t.ErrorMsg != ""
 }

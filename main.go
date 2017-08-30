@@ -24,8 +24,14 @@ func main() {
 
 	reader := bufio.NewReader(infile)
 	scanner := microjava.NewScanner(reader)
-	for i := 0; i < 10; i++ {
+	for {
 		token := scanner.NextToken()
 		fmt.Println(token)
+		if token.ErrorMsg != "" {
+			panic(token.ErrorMsg)
+		}
+		if token.IsEOF() {
+			break
+		}
 	}
 }
