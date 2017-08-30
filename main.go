@@ -27,7 +27,7 @@ func main() {
 	for {
 		token := scanner.NextToken()
 		fmt.Println(token)
-		if token.ErrorMsg != "" {
+		if token.IsError() {
 			panic(token.ErrorMsg)
 		}
 		if token.IsEOF() {
