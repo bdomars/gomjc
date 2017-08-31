@@ -154,6 +154,14 @@ func GetOperatorKind(lexeme string) TokenCode {
 	return tcNone
 }
 
+// GetTokenName returns a name for a token code
+func GetTokenName(token TokenCode) string {
+	if name, ok := TokenNames[token]; ok {
+		return name
+	}
+	panic("invalid token")
+}
+
 // IsEOF returns true if this is the last token in stream
 func (t *Token) IsEOF() bool {
 	return t.Kind == tcEOF

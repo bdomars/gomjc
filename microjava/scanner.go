@@ -241,6 +241,6 @@ func (s *Scanner) readOperator(token *Token) bool {
 	} else {
 		return false
 	}
-	token.Data = "poop"
+	token.Data = GetTokenName(token.Kind)
 	return true
 }
