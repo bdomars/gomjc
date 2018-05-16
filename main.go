@@ -22,6 +22,7 @@ func main() {
 		panic(err)
 	}
 
+	// Testing the scanner
 	reader := bufio.NewReader(infile)
 	scanner := microjava.NewScanner(reader)
 	for {
